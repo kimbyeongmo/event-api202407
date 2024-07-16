@@ -1,3 +1,4 @@
+
 package com.study.event.api.event.repository;
 
 import com.study.event.api.event.entity.EventUser;
@@ -11,4 +12,5 @@ public interface EventUserRepository extends JpaRepository<EventUser, String> {
     boolean existsByEmail(String email);
 
     Optional<EventUser> findByEmail(String email);
+
 }
