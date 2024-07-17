@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.DELETE, "/events/*").hasAuthority("ADMIN")
 
                 // 아래의 URL요청은 로그인 없이 모두 허용
+                .antMatchers(HttpMethod.PUT, "/auth/promote").hasAuthority("COMMON")
                 .antMatchers("/", "/auth/**").permitAll()
 //                .antMatchers(HttpMethod.POST,"/events/**").hasAnyRole("VIP", "ADMIN")
 
