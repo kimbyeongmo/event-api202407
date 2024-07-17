@@ -1,17 +1,19 @@
 package com.study.event.api.event.controller;
 
 import com.study.event.api.auth.TokenProvider;
-import com.study.event.api.auth.TokenProvider.TokenUserInfo;
 import com.study.event.api.event.dto.request.EventSaveDto;
 import com.study.event.api.event.dto.response.EventOneDto;
 import com.study.event.api.event.service.EventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+import static com.study.event.api.auth.TokenProvider.*;
 
 @RestController
 @RequestMapping("/events")
@@ -25,18 +27,18 @@ public class EventController {
     @GetMapping("/page/{pageNo}")
     public ResponseEntity<?> getList(
             // 토큰파싱 결과로 로그인에 성공한 회원의 PK
-            @AuthenticationPrincipal TokenUserInfo tokenUserInfo,
+            @AuthenticationPrincipal TokenUserInfo tokenInfo,
             @RequestParam(required = false) String sort,
             @PathVariable int pageNo
     ) throws InterruptedException {
 
-        log.info("token user id : {}", tokenUserInfo);
+        log.info("token info : {}", tokenInfo);
 
         if (sort == null) {
             return ResponseEntity.badRequest().body("sort 파라미터가 없습니다.");
         }
 
-        Map<String, Object> events = eventService.getEvents(pageNo, sort, tokenUserInfo.getUserId());
+        Map<String, Object> events = eventService.getEvents(pageNo, sort, tokenInfo.getUserId());
 
         // 의도적으로 2초간의 로딩을 설정
 //        Thread.sleep(2000);
@@ -57,6 +59,7 @@ public class EventController {
     }
 
     // 단일 조회 요청
+    @PreAuthorize("hasAuthority('PREMIUM') or hasAuthority('ADMIN')")
     @GetMapping("/{eventId}")
     public ResponseEntity<?> getEvent(@PathVariable Long eventId) {
 
